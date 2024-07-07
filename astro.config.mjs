@@ -6,10 +6,10 @@ import rehypeMathjax from "rehype-mathjax";
 import remarkMath from "remark-math";
 
 export default defineConfig({
-  site: "https://astro-nano-demo.vercel.app",
+  site: "https://daniel-gallo.github.io",
   integrations: [mdx(), sitemap(), tailwind()],
   markdown: {
     remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeMathjax]
-  }
+    rehypePlugins: [rehypeMathjax],
+  },
 });
