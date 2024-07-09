@@ -73,6 +73,12 @@ html.scrolled #back-to-top {
   @apply opacity-100 pointer-events-auto;
 }
 
+/* Add horizontal scroll bars if content is too wide */
 .katex {
   overflow: scroll hidden;
+}
+
+table {
+  overflow-x: auto;
+  display: block;
 }
