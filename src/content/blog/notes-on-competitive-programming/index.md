@@ -9,7 +9,7 @@ draft: false
 <summary>Print vectors and matrices</summary>
 
 ```cpp
-template <class T> ostream &operator<<(ostream &out, vector<T> v) {
+template <class T> ostream &operator<<(ostream &out, vector<T> &v) {
     for (auto &element : v) {
         out << element << '\t';
     }
@@ -17,7 +17,7 @@ template <class T> ostream &operator<<(ostream &out, vector<T> v) {
     return out;
 }
 
-template <class T> ostream &operator<<(ostream &out, vector<vector<T>> matrix) {
+template <class T> ostream &operator<<(ostream &out, vector<vector<T>> &matrix) {
     for (auto &row : matrix) {
         out << row << endl;
     }
