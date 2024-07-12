@@ -178,3 +178,26 @@ template <class T> struct SegmentTree {
 ```
 
 </details>
+
+## g++ ordered_set
+
+If we use a set and we want to get the index of an element, we can use `distance(s.begin(), s.find(e))`, but this is $O(n)$. We can use the g++ implementation, that includes two handy functions that are $O(\log n)$:
+- `order_of_key(k)`: number of items strictly smaller than k
+- `find_by_order(k)`: k-th element in the sorted collection (0-indexed)
+
+<details>
+
+<summary>Show g++ tree</summary>
+
+```cpp
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+
+using namespace __gnu_pbds;
+
+// key type -> int
+// value type -> null_type (so we get a set)
+#define ordered_set tree<int, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update>
+```
+
+</details>
