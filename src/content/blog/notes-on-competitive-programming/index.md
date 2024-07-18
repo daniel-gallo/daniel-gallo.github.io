@@ -57,6 +57,58 @@ template <class T> inline T read_number() {
 
 </details>
 
+# Strings
+
+## O(1) hash queries
+By preprocessing a string `s` in $O(n)$ we can compute the hash of `s[a...b]` for any `a` and `b` in $O(1)$.
+
+<details>
+
+<summary>Show StringHasher implementation</summary>
+
+```cpp
+struct StringHasher {
+    const long long A = 911382323;
+    const long long B = 972663749;
+
+    vector<long long> prefix_hash;
+    vector<long long> coefficients;
+    int n;
+
+    StringHasher(string s) {
+        n = s.size();
+
+        prefix_hash.assign(n, 0);
+        prefix_hash[0] = s[0];
+        for (int i = 1; i < n; ++i) {
+            prefix_hash[i] = (A * prefix_hash[i - 1] + s[i]) % B;
+        }
+
+        coefficients.assign(n, 0);
+        coefficients[0] = 1;
+        for (int i = 1; i < n; ++i) {
+            coefficients[i] = (A * coefficients[i - 1]) % B;
+        }
+    }
+
+    // Computes hash(s[a...b]) (both endpoints included)
+    long long hash(int a, int b) {
+        if (a == 0) {
+            return prefix_hash[b];
+        }
+
+        long long result = (prefix_hash[b] - prefix_hash[a - 1] * coefficients[b - a + 1]) % B;
+        if (result < 0) {
+            result += B;
+        }
+
+        return result;
+    }
+};
+```
+
+</details>
+
 # Range queries
 
 | Name                          | Operations  | Initialization | Update       | Access       |
