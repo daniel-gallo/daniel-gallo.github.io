@@ -33,11 +33,12 @@ type URLWithName = {
 const getURLsWithNames = (
   data: InferEntrySchema<"projects">,
 ): URLWithName[] => {
-  const { url, demoURL, repoURL } = data;
+  const { url, arxivURL, openReviewURL, repoURL } = data;
   const urlByName: Record<string, string | undefined> = {
-    link: url,
-    demo: demoURL,
-    repo: repoURL,
+    Link: url,
+    arXiv: arxivURL,
+    OpenReview: openReviewURL,
+    Repo: repoURL,
   };
 
   return Object.entries(urlByName)
