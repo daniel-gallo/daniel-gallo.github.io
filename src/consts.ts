@@ -31,6 +31,10 @@ export const PROJECTS: Metadata = {
 
 export const SOCIALS: Socials = [
   {
+    NAME: "scholar",
+    HREF: "https://scholar.google.com/citations?user=aXjcdv4AAAAJ",
+  },
+  {
     NAME: "github",
     HREF: "https://github.com/daniel-gallo",
   },
