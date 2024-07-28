@@ -4,7 +4,7 @@ export const SITE: Site = {
   NAME: "Daniel Gallo",
   EMAIL: "daniel.gallo.fernandez@student.uva.nl",
   NUM_POSTS_ON_HOMEPAGE: 3,
-  NUM_WORKS_ON_HOMEPAGE: 2,
+  NUM_BIO_ITEMS_ON_HOMEPAGE: 2,
   NUM_PROJECTS_ON_HOMEPAGE: 3,
 };
 
@@ -18,15 +18,15 @@ export const BLOG: Metadata = {
   DESCRIPTION: "A collection of articles on topics I am passionate about.",
 };
 
-export const WORK: Metadata = {
-  TITLE: "Work",
-  DESCRIPTION: "Where I have worked and what I have done.",
+export const BIO: Metadata = {
+  TITLE: "Bio",
+  DESCRIPTION: "Where I have worked and studied.",
 };
 
 export const PROJECTS: Metadata = {
   TITLE: "Projects",
   DESCRIPTION:
-    "A collection of my projects, with links to repositories and demos.",
+    "A collection of papers, and kaggle competitions",
 };
 
 export const SOCIALS: Socials = [
