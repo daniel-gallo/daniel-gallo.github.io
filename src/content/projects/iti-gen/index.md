@@ -2,6 +2,7 @@
 title: '📄 TMLR - Reproducibility Study of "ITI-GEN: Inclusive Text-to-Image Generation"'
 description: "ITI-GEN works and can be combined with HPS with negative prompting"
 date: "Jun 25 2024"
+arxivURL: "https://arxiv.org/abs/2407.19996"
 openReviewURL: "https://openreview.net/forum?id=d3Vj360Wi2"
 ---
 
