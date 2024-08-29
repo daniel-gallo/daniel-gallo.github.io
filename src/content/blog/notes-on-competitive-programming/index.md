@@ -29,6 +29,12 @@ template <class T> ostream &operator<<(ostream &out, vector<vector<T>> &matrix) 
 </details>
 
 # IO
+
+```cpp
+cin.tie(nullptr);
+ios_base::sync_with_stdio(false);
+```
+
 <details>
 
 <summary>Read numbers faster</summary>
@@ -53,6 +59,324 @@ template <class T> inline T read_number() {
 
     return x;
 }
+```
+
+</details>
+
+# Graph stuff
+
+## Dijkstra
+Gets all distances from a given node in $O(n + m\log(m))$.
+
+<details>
+
+<summary>Dijkstra implementation</summary>
+
+```cpp
+// Input:
+//  - adj: adj[src] = (dst, length), where everything is 0-indexed
+//  - start
+// Output:
+//  - d: d[dst] = min distance from start to dst
+vector<long long> dijkstra(const vector<vector<pair<int, long long>>> &adj, int start) {
+    int n = adj.size();
+
+    vector<long long> d(n, numeric_limits<long long>::max());
+    d[start] = 0;
+
+    vector<bool> is_closed(n, false);
+
+    priority_queue<pair<long long, int>> q;
+    q.push({0, start});
+
+    while (!q.empty()) {
+        auto [_, src] = q.top();
+        q.pop();
+
+        if (is_closed[src]) {
+            continue;
+        }
+        is_closed[src] = true;
+
+        for (auto [dst, length] : adj[src]) {
+            if (d[src] + length < d[dst]) {
+                d[dst] = d[src] + length;
+                q.push({-d[dst], dst});
+            }
+        }
+    }
+
+    return d;
+}
+```
+
+</details>
+
+## Floyd-Warshall
+
+Gets all pair-wise distances in $O(n^3)$.
+
+<details>
+
+<summary>Floyd-Warshall implementation</summary>
+
+```cpp
+constexpr long long inf = 1e18;
+
+// Input:
+//  - adj: adj[src] = (dst, length), where everything is 0-indexed
+// Output:
+//  - n x n matrix with all pairwise distances
+vector<vector<long long>> floyd_warshall(const vector<vector<pair<int, long long>>> &adj) {
+    int n = adj.size();
+    vector<vector<long long>> d(n, vector<long long>(n, inf));
+    for (int i = 0; i < n; ++i) {
+        d[i][i] = 0;
+    }
+    for (int src = 0; src < n; ++src) {
+        for (auto [dst, length] : adj[src]) {
+            d[src][dst] = min(d[src][dst], length);
+        }
+    }
+
+    for (int k = 0; k < n; ++k) {
+        for (int src = 0; src < n; ++src) {
+            for (int dst = 0; dst < n; ++dst) {
+                d[src][dst] = min(d[src][dst], d[src][k] + d[k][dst]);
+            }
+        }
+    }
+
+    return d;
+}
+```
+</details>
+
+## Max-Flow / Min-Cut
+The Ford-Fulkerson algorithm works as follows. At first, we will add reverse edges with zero capacity. This ensures that we can ``backtrack'' if we made a mistake choosing a earlier path. Then, we will repeat these two steps until we can no longer do Step 1.
+1. Find a path from the source to the sink. We will be able to push as much ``water'' as the smallest capacity in the path.
+2. Subtract the new flow from the original path, and add it to the reverse path. 
+
+How we find a path in Step 1 is up to us. If we do BFS, the algorithm runs in $O(nm^2)$ and is called Edmonds-Karp.
+
+<details>
+
+<summary>Edmonds-Karp implementation</summary>
+
+```cpp
+constexpr long long inf = numeric_limits<long long>::max();
+
+// adjacency list of the undirected graph
+vector<vector<int>> adj;
+// matrix for every pair of nodes
+// initially, capacities[src][dst] = weight
+vector<vector<long long>> capacities;
+int n;
+
+long long bfs(int source, int sink, vector<int> &parents) {
+    parents.assign(n, -1);
+    parents[source] = -2;
+    // (node, flow until that point)
+    queue<pair<int, long long>> q;
+    q.push({source, inf});
+
+    while (!q.empty()) {
+        auto [current_node, current_flow] = q.front();
+        q.pop();
+
+        for (int next_node : adj[current_node]) {
+            bool is_not_visited = parents[next_node] == -1;
+            bool is_reachable = capacities[current_node][next_node] > 0;
+            if (is_not_visited && is_reachable) {
+                parents[next_node] = current_node;
+                long long new_flow = min(current_flow, capacities[current_node][next_node]);
+                if (next_node == sink) {
+                    return new_flow;
+                }
+                q.push({next_node, new_flow});
+            }
+        }
+    }
+
+    return 0;
+}
+
+long long max_flow(int source, int sink) {
+    // Ford-Fulkerson algorithm with BFS (Edmonds-Karp)
+    long long flow = 0;
+    vector<int> parents(n);
+    long long new_flow = 0;
+
+    while ((new_flow = bfs(source, sink, parents)) > 0) {
+        flow += new_flow;
+        int current_node = sink;
+        while (current_node != source) {
+            int previous_node = parents[current_node];
+            capacities[previous_node][current_node] -= new_flow;
+            capacities[current_node][previous_node] += new_flow;
+            current_node = previous_node;
+        }
+    }
+
+    return flow;
+}
+```
+
+</details>
+
+## Kosaraju's algorithm
+
+Finds the strongly connected components (SCC) of a directed graph in $O(n + m)$. It runs DFS twice, the first one on the original graph, and the second one on the transpose graph (the one in which all edges are reversed). Some observations:
+
+- We will be able to traverse all nodes in a SCC in both the original and the transpose graph. In the first DFS pass, we might jump from one SCC to another. In the second one, this is not possible, as we will see shortly.
+- Let's imagine $u_1$ lives in $SCC_1$ and that $u_2$ lives in $SCC_2$ and that $SCC_1 \leadsto SCC_2$. Then $u_1$ will be ``closed'' after $u_2$. This is easy to see applying the "Parenthesis theorem" (the exploring intervals are either nested or disjoint).
+- Thus, in the second DFS, we want to start exploring nodes in $SCC_1$ first (as we will not be able to jump to $SCC_2$ in the transpose graph).
+
+<details>
+
+<summary>Kosaraju's algorithm implementation</summary>
+
+```cpp
+void dfs(int node, const vector<vector<int>> &adj, vector<bool> &visited, vector<int> &output) {
+    visited[node] = true;
+
+    for (int neighbor : adj[node]) {
+        if (visited[neighbor]) {
+            continue;
+        }
+
+        dfs(neighbor, adj, visited, output);
+    }
+
+    output.push_back(node);
+}
+
+vector<int> get_scc(const vector<vector<int>> &adj) {
+    // Kosaraju's algorithm
+    int n = adj.size();
+
+    // First DFS pass
+    vector<bool> visited(n, false);
+    vector<int> nodes_by_exit_time;
+    for (int node = 0; node < n; ++node) {
+        if (visited[node]) {
+            continue;
+        }
+
+        dfs(node, adj, visited, nodes_by_exit_time);
+    }
+    reverse(nodes_by_exit_time.begin(), nodes_by_exit_time.end());
+
+    // Construct transpose graph
+    vector<vector<int>> rev_adj(n);
+    for (int src = 0; src < n; ++src) {
+        for (int dst : adj[src]) {
+            rev_adj[dst].push_back(src);
+        }
+    }
+
+    // Second DFS pass on the transpose graph
+    visited.assign(n, false);
+    vector<int> scc_by_node(n, -1);
+    int scc_id = 0;
+    for (int node : nodes_by_exit_time) {
+        if (visited[node]) {
+            continue;
+        }
+
+        vector<int> nodes_in_scc;
+        dfs(node, rev_adj, visited, nodes_in_scc);
+        for (int node_in_scc : nodes_in_scc) {
+            scc_by_node[node_in_scc] = scc_id;
+        }
+        scc_id++;
+    }
+
+    return scc_by_node;
+}
+
+```
+
+</details>
+
+## Kruskal
+It finds a minimum spanning tree by adding edges in order as long as they don't create cycles. A fast implementation will use a data structure that allows merging sets quickly (Disjoint Set Union / Union-Find / Merge-Find).
+
+<details>
+
+<summary>Kruskal implementation</summary>
+
+```cpp
+struct Edge {
+    int src;
+    int dst;
+    int weight;
+
+    bool operator<(const Edge &other) const { return weight < other.weight; }
+};
+
+struct DSU {
+    vector<int> parents;
+
+    DSU(int n) {
+        parents.assign(n, 0);
+        for (int i = 0; i < n; ++i) {
+            parents[i] = i;
+        }
+    }
+
+    int find(int v) {
+        if (v == parents[v]) {
+            return v;
+        }
+
+        int representative = find(parents[v]);
+        // path-compression optimization
+        parents[v] = representative;
+        return representative;
+    }
+
+    void merge(int u, int v) {
+        u = find(u);
+        v = find(v);
+
+        if (u != v) {
+            parents[v] = u;
+        }
+    }
+};
+
+// Input:
+//   - n: the number of nodes in the graph
+//   - edges: a list of (src, dst, weight)
+// Output:
+//   - cost of the MST or -1 if the graph is not connected
+long long kruskal(int n, vector<Edge> &edges) {
+    sort(edges.begin(), edges.end());
+
+    DSU dsu = DSU(n);
+    long long cost = 0;
+    for (auto [src, dst, weight] : edges) {
+        int u = dsu.find(src);
+        int v = dsu.find(dst);
+
+        if (u != v) {
+            cost += weight;
+            dsu.merge(u, v);
+        }
+    }
+
+    // check if all nodes are connected
+    int representative = dsu.find(0);
+    for (int i = 1; i < n; ++i) {
+        if (dsu.find(i) != representative) {
+            return -1;
+        }
+    }
+
+    return cost;
+}
+
 ```
 
 </details>
