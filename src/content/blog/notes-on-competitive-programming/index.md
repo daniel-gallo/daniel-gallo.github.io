@@ -577,3 +577,108 @@ using namespace __gnu_pbds;
 ```
 
 </details>
+
+# Math
+## Matrix binary exponentiation
+This is useful to compute linear recursions in logarithmic time. For example, the Fibonacci numbers can be defined as follows:
+
+$$
+\begin{bmatrix}
+    F_n \\
+    F_{n + 1}
+\end{bmatrix}
+= 
+\begin{bmatrix}
+    0 & 1 \\
+    1 & 1
+\end{bmatrix}
+\begin{bmatrix}
+    F_{n - 1} \\
+    F_{n} \\
+\end{bmatrix}
+$$
+
+We see that
+
+$$
+\begin{bmatrix}
+    F_n \\
+    F_{n + 1}
+\end{bmatrix}
+= 
+\begin{bmatrix}
+    0 & 1 \\
+    1 & 1
+\end{bmatrix}^n
+\begin{bmatrix}
+    0 \\
+    1 \\
+\end{bmatrix}
+$$
+
+We can compute powers in logarithmic time by using binary exponentiation. For example, $5^{13} = 5^{1101_2} = 5^8 \cdot 5^4 \cdot 5^1$ (note that we don't need to perform 13 multiplications, we just need to compute $5^1, 5^2, 5^4$ and $5^8$).
+
+<details>
+
+<summary>See implementation</summary>
+
+```cpp
+class Matrix {
+  public:
+    int n;
+    vector<vector<ll>> m;
+
+    Matrix(vector<vector<ll>> &m) : n(m.size()), m(m) {}
+
+    Matrix(int n) : n(n) {
+        m.assign(n, vector<ll>(n, 0));
+
+        for (int i = 0; i < n; ++i) {
+            m[i][i] = 1;
+        }
+    }
+
+    Matrix operator*(const Matrix &other) const {
+        vector<vector<ll>> new_m(n, vector<ll>(n, 0));
+
+        for (int i = 0; i < n; ++i) {
+            for (int k = 0; k < n; ++k) {
+                for (int j = 0; j < n; ++j) {
+                    new_m[i][j] = (new_m[i][j] + m[i][k] * other.m[k][j]) % mod;
+                }
+            }
+        }
+
+        return Matrix(new_m);
+    }
+
+    vector<ll> operator*(const vector<ll> &v) const {
+        vector<ll> new_v(n);
+
+        for (int i = 0; i < n; ++i) {
+            for (int k = 0; k < n; ++k) {
+                new_v[i] = (new_v[i] + m[i][k] * v[k]) % mod;
+            }
+        }
+
+        return new_v;
+    }
+
+    Matrix operator^(long long power) const {
+        Matrix result(n);
+        Matrix base = *this;
+
+        while (power > 0) {
+            if (power % 2 == 1) {
+                result = result * base;
+            }
+            base = base * base;
+            power /= 2;
+        }
+
+        return result;
+    }
+};
+```
+
+</details>
