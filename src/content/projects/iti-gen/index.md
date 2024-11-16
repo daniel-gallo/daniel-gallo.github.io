@@ -4,6 +4,7 @@ description: "ITI-GEN works and can be combined with HPS with negative prompting
 date: "Jun 25 2024"
 arxivURL: "https://arxiv.org/abs/2407.19996"
 openReviewURL: "https://openreview.net/forum?id=d3Vj360Wi2"
+repoURL: "https://github.com/amonroym99/iti-gen-reproducibility"
 ---
 
 Text-to-image generative models often present issues regarding fairness with respect to certain sensitive attributes, such as gender or skin tone. This study aims to reproduce the results presented in [ITI-GEN: Inclusive Text-to-Image Generation](https://arxiv.org/abs/2309.05569) by Zhang et al. (2023), which introduces a model to improve inclusiveness in these kinds of models. We show that most of the claims made by the authors about ITI-GEN hold: it improves the diversity and quality of generated images, it is scalable to different domains, it has plug-and-play capabilities, and it is efficient from a computational point of view. 
