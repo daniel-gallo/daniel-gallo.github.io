@@ -63,6 +63,46 @@ template <class T> inline T read_number() {
 
 </details>
 
+# Binary search
+- `bisect_left(l, target)`: if target exists, it will output the index of the first occurrence. Otherwise, it will output the index where it should be inserted to keep the order.
+- `bisect_right(l, target)`: if target exists, it will output the index **after** the last occurrence. Otherwise it will output the index where it should be inserted to keep the order. 
+- Both methods return the same number if and only if target does not exist.
+
+<details>
+<summary>Binary search implementation</summary>
+
+```python
+def bisect_left(l, target):
+    lo = 0
+    hi = len(l)
+
+    while lo < hi:
+        mid = (lo + hi) // 2
+
+        if l[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid
+    
+    return lo
+
+def bisect_right(l, target):
+    lo = 0
+    hi = len(l)
+
+    while lo < hi:
+        mid = (lo + hi) // 2
+
+        if l[mid] <= target:
+            lo = mid + 1
+        else:
+            hi = mid
+
+    return lo
+```
+
+</details>
+
 # Graph stuff
 
 ## Dijkstra
